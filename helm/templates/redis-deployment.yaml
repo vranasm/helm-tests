@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coder-cache
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  selector:
+    matchLabels:
+      app: coder-cache
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: coder-cache
+    spec:
+      containers:
+        - name: redis-server
+          image: bitnami/redis:6.2.6-debian-10-r53
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-password
+                  name: redis-secret

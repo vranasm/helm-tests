@@ -35,4 +35,7 @@ monitoring:
     # jiri.moc - testing pipeline
 liquibase:
 coder:
-
+  DB_URL:  jdbc:sqlserver://zajidev.ais-servis.cz:1433;databaseName=codertest;encrypt=true;trustServerCertificate=true
+  DB_USER: disp
+  REDIS_HOST: coder-cache.coder-app.svc.cluster.local
+  REDIS_PORT: '6379'
