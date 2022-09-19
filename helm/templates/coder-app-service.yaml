@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ .Release.Name }}
+    # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#prometheusioscrape
+    # By default, Prometheus discovers PodMonitors and ServiceMonitors within its namespace,
+    # that are labeled with the same release tag as the prometheus-operator release
+    release: prom-stack
+spec:
+  selector:
+    app: {{ .Release.Name }}
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: "TCP"
+      port: {{ .Values.ports.service }}
+      targetPort: {{ .Values.ports.container }}

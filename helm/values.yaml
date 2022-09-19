@@ -1,0 +1,38 @@
+container:
+  image: core.harbor.domain/vranasm/coder
+  image_tag: latest
+  command:
+    - "java"
+  args:
+    - "-Dcom.sun.management.jmxremote"
+    - "-jar"
+    - "coder.jar"
+replicas: 3
+ports:
+  container: 8080
+  service: 8080
+ingress:
+  domain: coder.vranasm.domain
+  hidden_path: "/endpoints/(.*)"
+resources:
+  limits:
+    cpu: 1000m
+    memory: 4096Mi
+  requests:
+    cpu: 100m
+    memory: 4096Mi
+monitoring:
+  readiness:
+    initialDelaySeconds: 15
+  liveness:
+    initialDelaySeconds: 15
+  endpoints:
+    healthcheck: /actuator/health
+    #svc_monitor: /actuator/prometheus
+    health: /actuator/health
+    #env: /actuator/env
+    #metrics: /actuator/metrics
+    # jiri.moc - testing pipeline
+liquibase:
+coder:
+

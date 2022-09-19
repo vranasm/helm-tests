@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+        - name: harbor-registry-secret
+      containers:
+        - name: "{{ .Release.Name }}-container"
+          image: {{ .Values.container.image }}:{{ .Values.container.image_tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.ports.container }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.monitoring.endpoints.healthcheck }}
+              port: {{ .Values.ports.container }}
+            initialDelaySeconds: {{ .Values.monitoring.readiness.initialDelaySeconds }}
+            timeoutSeconds: 3
+
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.monitoring.endpoints.healthcheck }}
+              port: {{ .Values.ports.container }}
+            initialDelaySeconds: {{ .Values.monitoring.liveness.initialDelaySeconds }}
+            timeoutSeconds: 3
+            failureThreshold: 10
+          env:
+  {{- range $k, $v := .Values.coder }}
+            - name: {{ $k | quote }}
+              value: {{ $v | quote }}
+  {{- end }}
